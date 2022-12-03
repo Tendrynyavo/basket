@@ -7,6 +7,34 @@ public class Equipe extends BddObject {
 
     String idEquipe;
     String nom;
+    int score;
+    String idMatch;
+    Joueur PG;
+
+    public Joueur getPG() {
+        return PG;
+    }
+
+    public void setPG(Joueur PG) {
+        this.PG = PG;
+    }
+
+    public String getIdMatch() {
+        return idMatch;
+    }
+
+    public void setIdMatch(String idMatch) {
+        this.idMatch = idMatch;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
     Joueur[] joueurs;
 
     public String getIdEquipe() {

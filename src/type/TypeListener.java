@@ -1,5 +1,6 @@
 package type;
 
+import graphical.Basket;
 import joueur.Joueur;
 import match.Match;
 import statistique.Statistique;
@@ -13,6 +14,15 @@ public class TypeListener implements KeyListener {
     Joueur previous;
     Match match;
     Statistique tir;
+    Basket basket;
+
+    public Basket getBasket() {
+        return basket;
+    }
+
+    public void setBasket(Basket basket) {
+        this.basket = basket;
+    }
 
     public Statistique getTir() {
         return tir;
@@ -55,9 +65,8 @@ public class TypeListener implements KeyListener {
             try {
                 switch (e.getKeyChar()) {
                     case 'b':
-                        if (getPrevious() == null) getJoueur().changePossession(getJoueur(), getMatch());
-                        else getPrevious().changePossession(getJoueur(), getMatch());
-                        setPrevious(getJoueur());
+                        if (getPrevious() == null) getJoueur().changePossession(getJoueur(), getMatch(), this);
+                        else getPrevious().changePossession(getJoueur(), getMatch(), this);
                         break;
                     case 't':
                         getJoueur().shoot(getMatch());

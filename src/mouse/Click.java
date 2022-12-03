@@ -33,7 +33,6 @@ public class Click implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         getBasket().getTypeListener().setJoueur(getJoueur());
-        getBasket().setTitle(getJoueur().getNom());
     }
 
     @Override

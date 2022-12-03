@@ -52,6 +52,13 @@ public class Basket extends JFrame {
         return panels;
     }
 
+    public void paint(Graphics g) {
+        super.paint(g);
+        Joueur joueur = getMatch().havePossession();
+        if (joueur != null) this.setTitle(joueur.getNom());
+        this.repaint();
+    }
+
     public void setPanels(JPanel[] panels) {
         this.panels = panels;
     }
@@ -70,7 +77,9 @@ public class Basket extends JFrame {
         setTypeListener(new TypeListener(getMatch()));
         setFocusable(true);
         requestFocus();
-        addKeyListener(getTypeListener());
+        TypeListener type = getTypeListener();
+        addKeyListener(type);
+        match.setType(type);
         for (int i = 0; i < 2; i++)
             panels[i] = createTeam(match.getEquipes()[i]);
         add(panels[0]);
@@ -93,7 +102,9 @@ public class Basket extends JFrame {
         for (Champ champ : panel.getListeChamp())
             champ.setVisible(false, "");
         equipe.setJoueurs();
-        for (Joueur joueur: equipe.getJoueurs()) {
+        Joueur[] joueurs = equipe.getJoueurs();
+        equipe.setPG(joueurs[0]);
+        for (Joueur joueur: joueurs) {
             joueur.setEquipe(equipe);
             Button button = new Button(new Click(joueur, this), joueur.getNom());
             button.setFocusable(false);

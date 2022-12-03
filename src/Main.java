@@ -3,6 +3,7 @@ import equipe.Equipe;
 import formulaire.Button;
 import formulaire.Formulaire;
 import graphical.Basket;
+import joueur.Joueur;
 import match.Match;
 import mouse.Start;
 import javax.swing.*;

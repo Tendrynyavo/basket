@@ -5,6 +5,7 @@ import connection.BddObject;
 import equipe.Equipe;
 import match.Match;
 import statistique.Statistique;
+import type.TypeListener;
 
 public class Joueur extends BddObject {
 
@@ -12,11 +13,41 @@ public class Joueur extends BddObject {
     String nom;
     String poste;
     String idEquipe;
-    Equipe equipe;
+    int nombre;
+    int total;
+    String action;
     Statistique tir;
     Statistique rebond;
     boolean possession = false;
     boolean marque = false;
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) throws Exception {
+        if (total < 0) throw new Exception("Total is invalid");
+        this.total = total;
+    }
+
+    Equipe equipe;
+
+    public int getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(int nombre) throws Exception {
+        if (nombre < 0) throw new Exception("Nombre invalid");
+        this.nombre = nombre;
+    }
 
     public boolean isMarque() {
         return marque;
@@ -123,7 +154,7 @@ public class Joueur extends BddObject {
         return joueurs;
     }
 
-    public void changePossession(Joueur joueur, Match match) throws Exception {
+    public void changePossession(Joueur joueur, Match match, TypeListener type) throws Exception {
         if (joueur.isMarque()) throw new Exception(getEquipe().getNom() + " a marquée balle rendue à l'adversaire");
         if (joueur.isPossession()) throw new Exception(joueur.getNom() + " a déja le ballon");
         match.initMarque();
@@ -134,6 +165,7 @@ public class Joueur extends BddObject {
             setTir(null);
             joueur.makeRebond(match, this);
         } else if (!this.equals(joueur)) passe(match);
+        type.setPrevious(joueur);
     }
 
     public void makeRebond(Match match, Joueur joueurShoot) throws Exception {
@@ -166,6 +198,11 @@ public class Joueur extends BddObject {
         }
         setRebond(null);
         getEquipe().setMarques(true);
+        if (!match.getEquipes()[0].getIdEquipe().equals(this.getIdEquipe())) {
+            this.changePossession(match.getEquipes()[0].getPG(), match, match.getType());
+        } else if (!match.getEquipes()[1].getIdEquipe().equals(this.getIdEquipe())) {
+            this.changePossession(match.getEquipes()[1].getPG(), match, match.getType());
+        }
     }
 
     public Joueur[] getLastPasse(Match match) throws Exception {
