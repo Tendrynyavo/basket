@@ -4,8 +4,10 @@ import connection.BddObject;
 import equipe.Equipe;
 import formulaire.Button;
 import formulaire.Formulaire;
+import joueur.Joueur;
 import mouse.Start;
-import statistique.Statistique;
+import type.TypeListener;
+
 import java.sql.Date;
 
 public class Match extends BddObject {
@@ -15,6 +17,15 @@ public class Match extends BddObject {
     String idEquipe2;
     Date date;
     Equipe[] equipes = new Equipe[2];
+    TypeListener type;
+
+    public TypeListener getType() {
+        return type;
+    }
+
+    public void setType(TypeListener type) {
+        this.type = type;
+    }
 
     public String getIdEquipe1() {
         return idEquipe1;
@@ -59,11 +70,6 @@ public class Match extends BddObject {
     public Equipe[] getEquipes() {
         return equipes;
     }
-
-    public void setEquipes(Equipe[] equipes) {
-        this.equipes = equipes;
-    }
-
     public Match() {
         this.setTable("match");
         this.setPrefix("MAT");
@@ -88,6 +94,16 @@ public class Match extends BddObject {
         this.equipes[1] = Equipe.convert(equipe2.getData(BddObject.getPostgreSQL(), null, "idEquipe"))[0];
     }
 
+    public Joueur havePossession() {
+        for (Joueur joueur: equipes[0].getJoueurs()) {
+            if (joueur.isPossession()) return joueur;
+        }
+        for (Joueur joueur: equipes[1].getJoueurs()) {
+            if (joueur.isPossession()) return joueur;
+        }
+        return null;
+    }
+
     public static Formulaire getFormulaire() throws Exception {
         Formulaire form = Formulaire.createFormulaire(new Match());
         form.getListeChamp()[0].setVisible(false, "");
@@ -100,18 +116,11 @@ public class Match extends BddObject {
         form.getListeChamp()[2].changeToDrop(noms, ids);
         form.getListeChamp()[3].setVisible(false, "");
         form.getListeChamp()[4].setVisible(false, "");
+        form.getListeChamp()[5].setVisible(false, "");
         form.addButton(new Button(new Start(form), "OK"));
         form.setPosition();
         return form;
     }
-
-    public Statistique getLastStatistique() throws Exception {
-        Statistique statistique = new Statistique();
-        statistique.setIdMatch(getIdMatch());
-        Statistique[] statistiques = Statistique.convert(statistique.getData(BddObject.getPostgreSQL(), "idStat DESC", "idMatch"));
-        return statistiques[0];
-    }
-
     public void initMarque() {
         equipes[0].setMarques(false);
         equipes[1].setMarques(false);

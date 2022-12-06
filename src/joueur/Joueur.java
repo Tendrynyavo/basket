@@ -20,6 +20,7 @@ public class Joueur extends BddObject {
     Statistique rebond;
     boolean possession = false;
     boolean marque = false;
+    Equipe equipe;
 
     public String getAction() {
         return action;
@@ -37,8 +38,6 @@ public class Joueur extends BddObject {
         if (total < 0) throw new Exception("Total is invalid");
         this.total = total;
     }
-
-    Equipe equipe;
 
     public int getNombre() {
         return nombre;

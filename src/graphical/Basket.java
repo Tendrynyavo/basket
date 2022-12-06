@@ -13,7 +13,7 @@ import java.awt.*;
 
 public class Basket extends JFrame {
 
-    int width=950, height=350;
+    int width = 950, height = 350;
     Match match;
     JPanel[] panels = new JPanel[2];
     TypeListener type;
