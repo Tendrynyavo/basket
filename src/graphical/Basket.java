@@ -18,7 +18,6 @@ public class Basket extends JFrame {
     JPanel[] panels = new JPanel[2];
     TypeListener type;
 
-    @Override
     public int getWidth() {
         return width;
     }
@@ -35,7 +34,6 @@ public class Basket extends JFrame {
         this.width = width;
     }
 
-    @Override
     public int getHeight() {
         return height;
     }

@@ -122,12 +122,10 @@ public class Match extends BddObject {
     }
 
     public Joueur havePossession() {
-        for (Joueur joueur: equipes[0].getJoueurs()) {
+        for (Joueur joueur : equipes[0].getJoueurs())
             if (joueur.isPossession()) return joueur;
-        }
-        for (Joueur joueur: equipes[1].getJoueurs()) {
+        for (Joueur joueur : equipes[1].getJoueurs())
             if (joueur.isPossession()) return joueur;
-        }
         return null;
     }
 

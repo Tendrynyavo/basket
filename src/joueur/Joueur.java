@@ -5,6 +5,7 @@ import action.Passe;
 import connection.BddObject;
 import equipe.Equipe;
 import match.Match;
+import statistique.Individuel;
 import statistique.Statistique;
 import type.TypeListener;
 
@@ -14,12 +15,12 @@ public class Joueur extends BddObject {
     String nom;
     String poste;
     String idEquipe;
+    Individuel individuel;
     Statistique tir;
     Statistique rebond;
-    Statistique[] statistiques;
+    Equipe equipe;
     boolean possession = false;
     boolean marque = false;
-    Equipe equipe;
 
     public boolean isMarque() {
         return marque;
@@ -57,8 +58,7 @@ public class Joueur extends BddObject {
     }
 
     public void setIdJoueur(String idJoueur) throws Exception {
-        if (!idJoueur.contains(this.getPrefix()) || idJoueur.length() != this.getCountPK())
-            throw new Exception("Invalid ID Joueur");
+        if (!idJoueur.contains(this.getPrefix()) || idJoueur.length() != this.getCountPK()) throw new Exception("Invalid ID Joueur");
         this.idJoueur = idJoueur;
     }
 
@@ -76,8 +76,7 @@ public class Joueur extends BddObject {
 
     public void setIdEquipe(String idEquipe) throws Exception {
         Equipe equipe = new Equipe();
-        if (!idEquipe.contains(equipe.getPrefix()) || idEquipe.length() != equipe.getCountPK())
-            throw new Exception("ID Equipe invalid");
+        if (!idEquipe.contains(equipe.getPrefix()) || idEquipe.length() != equipe.getCountPK()) throw new Exception("ID Equipe invalid");
         this.idEquipe = idEquipe;
     }
 
@@ -97,18 +96,18 @@ public class Joueur extends BddObject {
         this.equipe = equipe;
     }
 
-    public Statistique[] getStatistiques() {
-        return statistiques;
+    public Individuel getIndividuel() {
+        return individuel;
     }
 
-    public void setStatistiques(Statistique[] statistiques) {
-        this.statistiques = statistiques;
+    public void setIndividuel(Individuel statistique) {
+        this.individuel = statistique;
     }
 
     public void setStatIndivual(Match match) throws Exception {
         Statistique statistique = new Statistique(match.getIdMatch(), getIdJoueur());
         statistique.setTable("statistique_individuel");
-        setStatistiques(Statistique.convert(statistique.getData(getPostgreSQL(), "nom DESC", "idMatch", "idJoueur")));
+        setIndividuel(new Individuel(this, Statistique.convert(statistique.getData(getPostgreSQL(), "nom DESC", "idMatch", "idJoueur"))));
     }
 
     public Joueur() {
@@ -128,8 +127,7 @@ public class Joueur extends BddObject {
 
     public static Joueur[] convert(Object[] objects) {
         Joueur[] joueurs = new Joueur[objects.length];
-        for (int i = 0; i < joueurs.length; i++)
-            joueurs[i] = (Joueur) objects[i];
+        for (int i = 0; i < joueurs.length; i++) joueurs[i] = (Joueur) objects[i];
         return joueurs;
     }
 
@@ -157,17 +155,17 @@ public class Joueur extends BddObject {
     public void passe(Match match) throws Exception {
         //LocalTime passeTime = LocalTime.now(); // time to passe player at other player
         setRebond(null);    
-        Passe passe = new Passe(this.getIdJoueur(), match.getIdMatch()); // create Passe BddObject with ID player and match
+        Passe passe = new Passe(getIdJoueur(), match.getIdMatch()); // create Passe BddObject with ID player and match
         passe.insert(null);
     }
 
     public void shoot(Match match) throws Exception {
-        if (!isPossession()) throw new Exception(this.getNom() + " n'a pas encore la possession");
+        if (!isPossession()) throw new Exception(getNom() + " n'a pas encore la possession");
         setTir(new Statistique(match.getIdMatch(), this.getIdJoueur(), "A010", 0));
     }
 
     public void marque(Match match) throws Exception {
-        if (getTir() == null) throw new Exception(this.getNom() + " n'a pas encore shooter");
+        if (getTir() == null) throw new Exception(getNom() + " n'a pas encore shooter");
         getTir().setNombre(2); // change to two points this tir
         getTir().insert(null);
         setTir(null); // reload tir in this player
