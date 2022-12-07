@@ -5,6 +5,8 @@ import connection.BddObject;
 public class Passe extends BddObject {
 
     String idPasse;
+    String idJoueur;
+    String idMatch;
 
     public String getIdPasse() {
         return idPasse;
@@ -13,9 +15,6 @@ public class Passe extends BddObject {
     public void setIdPasse(String idPasse) {
         this.idPasse = idPasse;
     }
-
-    String idJoueur;
-    String idMatch;
 
     public String getIdMatch() {
         return idMatch;

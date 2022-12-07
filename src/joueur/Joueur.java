@@ -1,5 +1,6 @@
 package joueur;
 
+// import java.time.LocalTime;
 import action.Passe;
 import connection.BddObject;
 import equipe.Equipe;
@@ -13,40 +14,12 @@ public class Joueur extends BddObject {
     String nom;
     String poste;
     String idEquipe;
-    int nombre;
-    int total;
-    String action;
     Statistique tir;
     Statistique rebond;
+    Statistique[] statistiques;
     boolean possession = false;
     boolean marque = false;
     Equipe equipe;
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public int getTotal() {
-        return total;
-    }
-
-    public void setTotal(int total) throws Exception {
-        if (total < 0) throw new Exception("Total is invalid");
-        this.total = total;
-    }
-
-    public int getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(int nombre) throws Exception {
-        if (nombre < 0) throw new Exception("Nombre invalid");
-        this.nombre = nombre;
-    }
 
     public boolean isMarque() {
         return marque;
@@ -94,7 +67,6 @@ public class Joueur extends BddObject {
     }
 
     public void setNom(String nom) {
-
         this.nom = nom;
     }
 
@@ -125,6 +97,20 @@ public class Joueur extends BddObject {
         this.equipe = equipe;
     }
 
+    public Statistique[] getStatistiques() {
+        return statistiques;
+    }
+
+    public void setStatistiques(Statistique[] statistiques) {
+        this.statistiques = statistiques;
+    }
+
+    public void setStatIndivual(Match match) throws Exception {
+        Statistique statistique = new Statistique(match.getIdMatch(), getIdJoueur());
+        statistique.setTable("statistique_individuel");
+        setStatistiques(Statistique.convert(statistique.getData(getPostgreSQL(), "nom DESC", "idMatch", "idJoueur")));
+    }
+
     public Joueur() {
         this.setTable("joueur");
         this.setPrefix("JOU");
@@ -138,12 +124,6 @@ public class Joueur extends BddObject {
         this.setNom(nom);
         this.setIdEquipe(idEquipe);
         this.setPoste(poste);
-    }
-
-    public void setEquipe() throws Exception {
-        Equipe equipe = new Equipe();
-        equipe.setIdEquipe(getIdEquipe());
-        setEquipe(Equipe.convert(equipe.getData(BddObject.getPostgreSQL(), null, "idEquipe"))[0]);
     }
 
     public static Joueur[] convert(Object[] objects) {
@@ -168,15 +148,16 @@ public class Joueur extends BddObject {
     }
 
     public void makeRebond(Match match, Joueur joueurShoot) throws Exception {
-        Statistique rebond = new Statistique(match.getIdMatch(), this.getIdJoueur(), "A040", 1);
-        if (joueurShoot.getIdEquipe().equals(getIdEquipe())) rebond.setIdAction("A030");
-        rebond.insert(null);
-        setRebond(rebond);
+        setRebond(new Statistique(match.getIdMatch(), getIdJoueur(), "A040", 1));
+        if (joueurShoot.getIdEquipe().equals(getIdEquipe())) getRebond().setIdAction("A030");
+        getRebond().insert(null);
     }
 
+    // todo : find ways to create time in this passe
     public void passe(Match match) throws Exception {
-        setRebond(null);
-        Passe passe = new Passe(this.getIdJoueur(), match.getIdMatch());
+        //LocalTime passeTime = LocalTime.now(); // time to passe player at other player
+        setRebond(null);    
+        Passe passe = new Passe(this.getIdJoueur(), match.getIdMatch()); // create Passe BddObject with ID player and match
         passe.insert(null);
     }
 
@@ -187,21 +168,17 @@ public class Joueur extends BddObject {
 
     public void marque(Match match) throws Exception {
         if (getTir() == null) throw new Exception(this.getNom() + " n'a pas encore shooter");
-        getTir().setNombre(2);
+        getTir().setNombre(2); // change to two points this tir
         getTir().insert(null);
-        setTir(null);
-        Joueur[] previous = getLastPasse(match);
-        if ((previous.length > 0) && (previous[0].getIdEquipe().equals(this.getIdEquipe())) && this.getRebond() == null) {
-            Statistique statistique = new Statistique(match.getIdMatch(), previous[0].getIdJoueur(), "A020", 1);
-            statistique.insert(null);
-        }
-        setRebond(null);
-        getEquipe().setMarques(true);
-        if (!match.getEquipes()[0].getIdEquipe().equals(this.getIdEquipe())) {
-            this.changePossession(match.getEquipes()[0].getPG(), match, match.getType());
-        } else if (!match.getEquipes()[1].getIdEquipe().equals(this.getIdEquipe())) {
-            this.changePossession(match.getEquipes()[1].getPG(), match, match.getType());
-        }
+        setTir(null); // reload tir in this player
+        Joueur[] previous = getLastPasse(match); // get last player who pass this ballon
+        // * if this player make rebond anyone get Passe Décisif
+        if ((previous.length > 0) && (previous[0].getIdEquipe().equals(getIdEquipe())) && getRebond() == null)
+            new Statistique(match.getIdMatch(), previous[0].getIdJoueur(), "A020", 1).insert(null);
+        setRebond(null); // reload rebond of this player
+        getEquipe().setMarques(true); // anyone in equipe of this player can't have ballon after this shoot
+        // * Change automatically possession in PG of adversaire
+        changePossession(((!match.getEquipes()[0].getIdEquipe().equals(this.getIdEquipe()))) ? match.getEquipes()[0].getPG() : match.getEquipes()[1].getPG(), match, match.getType());
     }
 
     public Joueur[] getLastPasse(Match match) throws Exception {

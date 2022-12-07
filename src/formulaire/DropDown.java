@@ -23,7 +23,7 @@ public class DropDown extends JComboBox<String> {
     }
 
     public String getSelectedValue() {
-        return this.value[this.getSelectedIndex()];
+        return value[getSelectedIndex()];
     }
     
     public String[] getValue() {

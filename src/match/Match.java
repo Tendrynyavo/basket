@@ -7,8 +7,8 @@ import formulaire.Formulaire;
 import joueur.Joueur;
 import mouse.Start;
 import type.TypeListener;
-
 import java.sql.Date;
+import java.time.LocalTime;
 
 public class Match extends BddObject {
 
@@ -18,6 +18,15 @@ public class Match extends BddObject {
     Date date;
     Equipe[] equipes = new Equipe[2];
     TypeListener type;
+    LocalTime time; // ? What type of variable we can use 
+
+    public void setTime(LocalTime time) {
+        this.time = time;
+    }
+
+    public LocalTime getTime() {
+        return time;
+    }
 
     public TypeListener getType() {
         return type;
@@ -70,6 +79,11 @@ public class Match extends BddObject {
     public Equipe[] getEquipes() {
         return equipes;
     }
+
+    public void setEquipes(Equipe[] equipes) {
+        this.equipes = equipes;
+    }
+
     public Match() {
         this.setTable("match");
         this.setPrefix("MAT");
@@ -85,13 +99,26 @@ public class Match extends BddObject {
         this.setDate(date);
     }
 
+    public static Match getMatch(String idMatch) throws Exception {
+        Match match = new Match();
+        match.setIdMatch(idMatch);
+        match = Match.convert(match.getData(getPostgreSQL(), null, "idMatch"))[0];
+        match.setEquipes();
+        return match;
+    }
+
     public void setEquipes() throws Exception {
-        Equipe equipe1 = new Equipe();
-        equipe1.setIdEquipe(getIdEquipe1());
-        Equipe equipe2 = new Equipe();
-        equipe2.setIdEquipe(getIdEquipe2());
-        this.equipes[0] = Equipe.convert(equipe1.getData(BddObject.getPostgreSQL(), null, "idEquipe"))[0];
-        this.equipes[1] = Equipe.convert(equipe2.getData(BddObject.getPostgreSQL(), null, "idEquipe"))[0];
+        Equipe equipe = new Equipe();
+        equipe.setTable("score_final");
+        equipe.setIdMatch(getIdMatch());
+        Equipe[] equipes = Equipe.convert(equipe.getData(BddObject.getPostgreSQL(), "idequipe", "idMatch"));
+        for (Equipe team : equipes) {
+            team.setJoueurs();
+            for (Joueur player : team.getJoueurs()) {
+                player.setStatIndivual(this);
+            }
+        }
+        setEquipes(equipes);
     }
 
     public Joueur havePossession() {
@@ -110,19 +137,25 @@ public class Match extends BddObject {
         Equipe[] equipes = Equipe.convert(new Equipe().getData(BddObject.getPostgreSQL(), null));
         String[] noms = Equipe.getNom(equipes);
         String[] ids = Equipe.getIdEquipe(equipes);
-        form.getListeChamp()[1].setLabel("Equipe 1 :");
-        form.getListeChamp()[1].changeToDrop(noms, ids);
-        form.getListeChamp()[2].setLabel("Equipe 2 :");
-        form.getListeChamp()[2].changeToDrop(noms, ids);
-        form.getListeChamp()[3].setVisible(false, "");
-        form.getListeChamp()[4].setVisible(false, "");
-        form.getListeChamp()[5].setVisible(false, "");
+        for (int i = 1; i <= 2; i++) {
+            form.getListeChamp()[i].setLabel("Equipe " + i + " :");
+            form.getListeChamp()[i].changeToDrop(noms, ids);
+        }
+        for (int j = 3; j <= 6; j++) form.getListeChamp()[j].setVisible(false, "");
         form.addButton(new Button(new Start(form), "OK"));
         form.setPosition();
         return form;
     }
+
     public void initMarque() {
         equipes[0].setMarques(false);
         equipes[1].setMarques(false);
+    }
+
+    public static Match[] convert(Object[] objects) {
+        Match[] matchs = new Match[objects.length];
+        for (int i = 0; i < matchs.length; i++)
+            matchs[i] = (Match) objects[i];
+        return matchs;
     }
 }

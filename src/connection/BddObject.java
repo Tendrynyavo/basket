@@ -9,11 +9,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
 public abstract class BddObject {
 
     String prefix;

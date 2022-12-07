@@ -12,6 +12,24 @@ public class Statistique extends BddObject {
     String idJoueur;
     String idAction;
     int nombre;
+    int attempt;
+    String action;
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public int getAttempt() {
+        return attempt;
+    }
+
+    public void setAttempt(int attempt) {
+        this.attempt = attempt;
+    }
 
     public String getIdStat() {
         return idStat;
@@ -61,7 +79,7 @@ public class Statistique extends BddObject {
     }
 
     public void setNombre(int nombre) throws Exception {
-        if (nombre > 3)
+        if (nombre < 0)
             throw new Exception("Nombre invalid");
         this.nombre = nombre;
     }
@@ -80,6 +98,12 @@ public class Statistique extends BddObject {
         setIdJoueur(idJoueur);
         setIdAction(idAction);
         setNombre(nombre);
+    }
+
+    public Statistique(String idMatch, String idJoueur) throws Exception {
+        this();
+        setIdMatch(idMatch);
+        setIdJoueur(idJoueur);
     }
 
     public static Statistique[] convert(Object[] objects) {

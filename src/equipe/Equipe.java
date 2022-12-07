@@ -9,6 +9,7 @@ public class Equipe extends BddObject {
     String nom;
     int score;
     String idMatch;
+    Joueur[] joueurs;
     Joueur PG;
 
     public Joueur getPG() {
@@ -34,8 +35,6 @@ public class Equipe extends BddObject {
     public void setScore(int score) {
         this.score = score;
     }
-
-    Joueur[] joueurs;
 
     public String getIdEquipe() {
         return idEquipe;
