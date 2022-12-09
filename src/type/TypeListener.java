@@ -1,35 +1,24 @@
 package type;
 
-import graphical.Basket;
 import joueur.Joueur;
 import match.Match;
-import statistique.Statistique;
-
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class TypeListener implements KeyListener {
+
     Joueur joueur;
     Joueur previous;
     Match match;
-    Statistique tir;
-    Basket basket;
+    int debut;
 
-    public Basket getBasket() {
-        return basket;
+    public int getDebut() {
+        return debut;
     }
 
-    public void setBasket(Basket basket) {
-        this.basket = basket;
-    }
-
-    public Statistique getTir() {
-        return tir;
-    }
-
-    public void setTir(Statistique tir) {
-        this.tir = tir;
+    public void setDebut(int debut) {
+        this.debut = debut;
     }
 
     public Match getMatch() {
@@ -59,14 +48,17 @@ public class TypeListener implements KeyListener {
     public TypeListener(Match match) {
         setMatch(match);
     }
-    @Override
+
     public void keyTyped(KeyEvent e) {
         if (getJoueur() != null) {
             try {
                 switch (e.getKeyChar()) {
                     case 'b':
-                        if (getPrevious() == null) getJoueur().changePossession(getJoueur(), getMatch(), this);
-                        else getPrevious().changePossession(getJoueur(), getMatch(), this);
+                        if (getPrevious() == null) {
+                            getMatch().getChrono().start();
+                            getMatch().setDebut(0);
+                            getJoueur().changePossession(getJoueur(), getMatch());
+                        } else getPrevious().changePossession(getJoueur(), getMatch());
                         break;
                     case 't':
                         getJoueur().shoot(getMatch());
@@ -83,12 +75,10 @@ public class TypeListener implements KeyListener {
         }
     }
 
-    @Override
     public void keyPressed(KeyEvent e) {
 
     }
 
-    @Override
     public void keyReleased(KeyEvent e) {
 
     }

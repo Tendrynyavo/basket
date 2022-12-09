@@ -6,8 +6,8 @@ import connection.BddObject;
 import equipe.Equipe;
 import match.Match;
 import statistique.Individuel;
+import statistique.Possession;
 import statistique.Statistique;
-import type.TypeListener;
 
 public class Joueur extends BddObject {
 
@@ -131,7 +131,7 @@ public class Joueur extends BddObject {
         return joueurs;
     }
 
-    public void changePossession(Joueur joueur, Match match, TypeListener type) throws Exception {
+    public void changePossession(Joueur joueur, Match match) throws Exception {
         if (joueur.isMarque()) throw new Exception(getEquipe().getNom() + " a marquée balle rendue à l'adversaire");
         if (joueur.isPossession()) throw new Exception(joueur.getNom() + " a déja le ballon");
         match.initMarque();
@@ -142,7 +142,14 @@ public class Joueur extends BddObject {
             setTir(null);
             joueur.makeRebond(match, this);
         } else if (!this.equals(joueur)) passe(match);
-        type.setPrevious(joueur);
+        match.getType().setPrevious(joueur);
+    }
+
+    public void savePossession(Match match) throws Exception {
+        match.getChrono().stop();
+        Possession possession = new Possession(this.getIdJoueur(), match.getIdMatch(), (int) match.getChrono().getDureeSec());
+        possession.insert(null);
+        match.getChrono().start();
     }
 
     public void makeRebond(Match match, Joueur joueurShoot) throws Exception {
@@ -154,13 +161,15 @@ public class Joueur extends BddObject {
     // todo : find ways to create time in this passe
     public void passe(Match match) throws Exception {
         //LocalTime passeTime = LocalTime.now(); // time to passe player at other player
-        setRebond(null);    
+        savePossession(match);
+        setRebond(null);
         Passe passe = new Passe(getIdJoueur(), match.getIdMatch()); // create Passe BddObject with ID player and match
         passe.insert(null);
     }
 
     public void shoot(Match match) throws Exception {
         if (!isPossession()) throw new Exception(getNom() + " n'a pas encore la possession");
+        savePossession(match);
         setTir(new Statistique(match.getIdMatch(), this.getIdJoueur(), "A010", 0));
     }
 
@@ -176,7 +185,11 @@ public class Joueur extends BddObject {
         setRebond(null); // reload rebond of this player
         getEquipe().setMarques(true); // anyone in equipe of this player can't have ballon after this shoot
         // * Change automatically possession in PG of adversaire
-        changePossession(((!match.getEquipes()[0].getIdEquipe().equals(this.getIdEquipe()))) ? match.getEquipes()[0].getPG() : match.getEquipes()[1].getPG(), match, match.getType());
+        Joueur joueur = ((!match.getEquipes()[0].getIdEquipe().equals(this.getIdEquipe()))) ? match.getEquipes()[0].getPG() : match.getEquipes()[1].getPG();
+        match.initMarque();
+        this.setPossession(false);
+        joueur.setPossession(true);
+        match.getType().setPrevious(joueur);
     }
 
     public Joueur[] getLastPasse(Match match) throws Exception {

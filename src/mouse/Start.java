@@ -3,11 +3,12 @@ package mouse;
 import formulaire.Formulaire;
 import graphical.Basket;
 import match.Match;
+import time.Chrono;
+
 import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.Date;
-import java.time.LocalTime;
 
 public class Start implements MouseListener {
 
@@ -31,7 +32,7 @@ public class Start implements MouseListener {
             Match match = new Match(values[1], values[2], new Date(System.currentTimeMillis()));
             match.insert(null);
             match.setEquipes();
-            match.setTime(LocalTime.now());
+            match.setChrono(new Chrono());
             new Basket(match);
         } catch (Exception exception) {
             JOptionPane.showMessageDialog(new JFrame(), exception.getMessage());

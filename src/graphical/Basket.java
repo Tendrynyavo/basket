@@ -7,6 +7,7 @@ import formulaire.Formulaire;
 import joueur.Joueur;
 import match.Match;
 import mouse.Click;
+import mouse.Pause;
 import type.TypeListener;
 import javax.swing.*;
 import java.awt.*;
@@ -80,6 +81,12 @@ public class Basket extends JFrame {
         match.setType(type);
         for (int i = 0; i < 2; i++)
             panels[i] = createTeam(match.getEquipes()[i]);
+        Pause pause = new Pause(this.getMatch());
+        Button button = new Button(pause, "Pause");
+        pause.setButton(button);
+        button.setFocusable(false);
+        ((Formulaire) panels[0]).addButton(button);
+        for (int i = 0; i < panels.length; i++) ((Formulaire) panels[i]).setPosition();
         add(panels[0]);
         panels[1].setBackground(Color.lightGray);
         add(panels[1]);
@@ -95,7 +102,7 @@ public class Basket extends JFrame {
         setVisible(true);
     }
 
-    public JPanel createTeam(Equipe equipe) throws Exception {
+    public Formulaire createTeam(Equipe equipe) throws Exception {
         Formulaire panel = Formulaire.createFormulaire(new Joueur());
         for (Champ champ : panel.getListeChamp())
             champ.setVisible(false, "");
@@ -108,7 +115,6 @@ public class Basket extends JFrame {
             button.setFocusable(false);
             panel.addButton(button);
         }
-        panel.setPosition();
         return panel;
     }
 }

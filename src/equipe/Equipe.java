@@ -2,6 +2,8 @@ package equipe;
 
 import connection.BddObject;
 import joueur.Joueur;
+import match.Match;
+import time.Temps;
 
 public class Equipe extends BddObject {
 
@@ -11,6 +13,15 @@ public class Equipe extends BddObject {
     String idMatch;
     Joueur[] joueurs;
     Joueur PG;
+    Temps time;
+
+    public Temps getTime() {
+        return time;
+    }
+
+    public void setTime(Temps time) {
+        this.time = time;
+    }
 
     public Joueur getPG() {
         return PG;
@@ -103,5 +114,10 @@ public class Equipe extends BddObject {
     public void setMarques(boolean marque) {
         for (Joueur joueur: getJoueurs())
             joueur.setMarque(marque);
+    }
+
+    public void setTimes(Match match) throws Exception {
+        Temps temp = new Temps(match, this);
+        setTime(Temps.convert(temp.getData(getPostgreSQL(), null, "idMatch", "idEquipe"))[0]);
     }
 }

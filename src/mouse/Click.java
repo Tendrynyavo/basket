@@ -6,11 +6,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class Click implements MouseListener {
+    
     Joueur joueur;
     Basket basket;
+
     public Joueur getJoueur() {
         return joueur;
     }
+    
     public void setJoueur(Joueur joueur) {
         this.joueur = joueur;
     }

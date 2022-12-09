@@ -6,9 +6,9 @@ import formulaire.Button;
 import formulaire.Formulaire;
 import joueur.Joueur;
 import mouse.Start;
+import time.Chrono;
 import type.TypeListener;
 import java.sql.Date;
-import java.time.LocalTime;
 
 public class Match extends BddObject {
 
@@ -18,14 +18,23 @@ public class Match extends BddObject {
     Date date;
     Equipe[] equipes = new Equipe[2];
     TypeListener type;
-    LocalTime time; // ? What type of variable we can use 
+    Chrono chrono;
+    int debut;
 
-    public void setTime(LocalTime time) {
-        this.time = time;
+    public int getDebut() {
+        return debut;
     }
 
-    public LocalTime getTime() {
-        return time;
+    public void setDebut(int debut) {
+        this.debut = debut;
+    }
+
+    public Chrono getChrono() {
+        return chrono;
+    }
+
+    public void setChrono(Chrono chrono) {
+        this.chrono = chrono;
     }
 
     public TypeListener getType() {
@@ -113,11 +122,14 @@ public class Match extends BddObject {
         equipe.setIdMatch(getIdMatch());
         Equipe[] equipes = Equipe.convert(equipe.getData(BddObject.getPostgreSQL(), "idequipe", "idMatch"));
         for (Equipe team : equipes) {
-            team.setJoueurs();
-            for (Joueur player : team.getJoueurs()) {
+            team.setJoueurs();  
+            team.setTimes(this);
+            for (Joueur player : team.getJoueurs())
                 player.setStatIndivual(this);
-            }
         }
+        double seconde = equipes[0].getTime().getTime() + equipes[1].getTime().getTime();
+        for (int i = 0; i < equipes.length; i++)
+            equipes[i].getTime().setPourcentageTotal(seconde);
         setEquipes(equipes);
     }
 
@@ -139,7 +151,7 @@ public class Match extends BddObject {
             form.getListeChamp()[i].setLabel("Equipe " + i + " :");
             form.getListeChamp()[i].changeToDrop(noms, ids);
         }
-        for (int j = 3; j <= 6; j++) form.getListeChamp()[j].setVisible(false, "");
+        for (int j = 3; j <= 7; j++) form.getListeChamp()[j].setVisible(false, "");
         form.addButton(new Button(new Start(form), "OK"));
         form.setPosition();
         return form;
