@@ -30,7 +30,7 @@ public class Pause implements MouseListener {
     public Pause(Match match) {
         setMatch(match);
     }
-    @Override
+
     public void mouseClicked(MouseEvent e) {
         if (getMatch().getChrono().isPause()) {
             getMatch().getChrono().resume();

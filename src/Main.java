@@ -6,6 +6,8 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Formulaire formulaire = Match.getFormulaire();
-        formulaire.initFrame(new JFrame());
+        JFrame frame = new JFrame();
+        formulaire.initFrame(frame);
+        frame.setSize(600, 300);
     }
 }

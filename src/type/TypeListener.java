@@ -57,8 +57,8 @@ public class TypeListener implements KeyListener {
                         if (getPrevious() == null) {
                             getMatch().getChrono().start();
                             getMatch().setDebut(0);
-                            getJoueur().changePossession(getJoueur(), getMatch());
-                        } else getPrevious().changePossession(getJoueur(), getMatch());
+                            getJoueur().makePasse(getJoueur(), getMatch());
+                        } else getPrevious().makePasse(getJoueur(), getMatch());
                         break;
                     case 't':
                         getJoueur().shoot(getMatch());

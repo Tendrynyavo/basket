@@ -127,17 +127,16 @@ public class Match extends BddObject {
             for (Joueur player : team.getJoueurs())
                 player.setStatIndivual(this);
         }
-        double seconde = equipes[0].getTime().getTime() + equipes[1].getTime().getTime();
         for (int i = 0; i < equipes.length; i++)
-            equipes[i].getTime().setPourcentageTotal(seconde);
+            equipes[i].getTime().setPourcentageTotal(equipes[0].getTime().getTime() + equipes[1].getTime().getTime());
         setEquipes(equipes);
     }
 
     public Joueur havePossession() {
-        for (Joueur joueur : equipes[0].getJoueurs())
-            if (joueur.isPossession()) return joueur;
-        for (Joueur joueur : equipes[1].getJoueurs())
-            if (joueur.isPossession()) return joueur;
+        for (Equipe equipe : equipes) {
+            for (Joueur joueur : equipe.getJoueurs())
+                if (joueur.isPossession()) return joueur;
+        }
         return null;
     }
 

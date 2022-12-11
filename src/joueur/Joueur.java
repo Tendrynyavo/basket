@@ -131,18 +131,15 @@ public class Joueur extends BddObject {
         return joueurs;
     }
 
-    public void changePossession(Joueur joueur, Match match) throws Exception {
+    public void makePasse(Joueur joueur, Match match) throws Exception {
         if (joueur.isMarque()) throw new Exception(getEquipe().getNom() + " a marquée balle rendue à l'adversaire");
         if (joueur.isPossession()) throw new Exception(joueur.getNom() + " a déja le ballon");
-        match.initMarque();
-        this.setPossession(false);
-        joueur.setPossession(true);
+        changePossession(joueur, match);
         if (getTir() != null) {
             getTir().insert(null);
             setTir(null);
             joueur.makeRebond(match, this);
-        } else if (!this.equals(joueur)) passe(match);
-        match.getType().setPrevious(joueur);
+        } else if (!this.equals(joueur)) insertPasse(match);
     }
 
     public void savePossession(Match match) throws Exception {
@@ -158,9 +155,7 @@ public class Joueur extends BddObject {
         getRebond().insert(null);
     }
 
-    // todo : find ways to create time in this passe
-    public void passe(Match match) throws Exception {
-        //LocalTime passeTime = LocalTime.now(); // time to passe player at other player
+    public void insertPasse(Match match) throws Exception {
         savePossession(match);
         setRebond(null);
         Passe passe = new Passe(getIdJoueur(), match.getIdMatch()); // create Passe BddObject with ID player and match
@@ -185,16 +180,19 @@ public class Joueur extends BddObject {
         setRebond(null); // reload rebond of this player
         getEquipe().setMarques(true); // anyone in equipe of this player can't have ballon after this shoot
         // * Change automatically possession in PG of adversaire
-        Joueur joueur = ((!match.getEquipes()[0].getIdEquipe().equals(this.getIdEquipe()))) ? match.getEquipes()[0].getPG() : match.getEquipes()[1].getPG();
-        match.initMarque();
-        this.setPossession(false);
-        joueur.setPossession(true);
-        match.getType().setPrevious(joueur);
+        changePossession(((!match.getEquipes()[0].getIdEquipe().equals(this.getIdEquipe()))) ? match.getEquipes()[0].getPG() : match.getEquipes()[1].getPG(), match);
     }
 
     public Joueur[] getLastPasse(Match match) throws Exception {
         Joueur joueur = new Joueur();
         joueur.setTable("get_last_passe('" + match.getIdMatch() + "')");
         return Joueur.convert(joueur.getData(BddObject.getPostgreSQL(), null));
+    }
+
+    public void changePossession(Joueur joueur, Match match)  {
+        match.initMarque();
+        this.setPossession(false);
+        joueur.setPossession(true);
+        match.getType().setPrevious(joueur);
     }
 }

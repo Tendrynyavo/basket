@@ -4,7 +4,6 @@ import formulaire.Formulaire;
 import graphical.Basket;
 import match.Match;
 import time.Chrono;
-
 import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -25,7 +24,6 @@ public class Start implements MouseListener {
         this.formulaire = formulaire;
     }
 
-    @Override
     public void mouseClicked(MouseEvent e) {
         String[] values = getFormulaire().getText();
         try {
@@ -39,22 +37,18 @@ public class Start implements MouseListener {
         }
     }
 
-    @Override
     public void mousePressed(MouseEvent e) {
 
     }
 
-    @Override
     public void mouseReleased(MouseEvent e) {
 
     }
 
-    @Override
     public void mouseEntered(MouseEvent e) {
 
     }
 
-    @Override
     public void mouseExited(MouseEvent e) {
 
     }
